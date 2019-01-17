@@ -21,9 +21,11 @@ import writable.PointWritable;
 
 public class StateJob extends Configured implements Tool{
 	
+	// TODO: a parametrer
+	private static double EBSELON = 0.05;
 	
 	/**
-	 * This should work as a replacement for the old getCentroids, it can work on bowth 
+	 * This should work as a replacement for the old getCentroids, it can work on both 
 	 * a single centroid file, or a directory containing job output files 
 	 * juste 3malt il fonction, ma sta3malthach w ma tastithach 
 	 */
@@ -73,9 +75,6 @@ public class StateJob extends Configured implements Tool{
 		
 		Path old = new Path(args[0]);
 		Path newP = new Path(args[1]);
-		
-		System.out.println(old);
-		System.out.println(newP);
 
 		Configuration conf = getConf();
 		FileSystem fs = FileSystem.get(conf);
@@ -91,15 +90,14 @@ public class StateJob extends Configured implements Tool{
 		fs.rename(newP, old);
 		fs.close();
 		
-		oldC.forEach(System.out::println);
-		newC.forEach(System.out::println);
-		
-		for(int i=0; i<oldC.size(); i++)
-			if(! oldC.get(i).equals(newC.get(i)))
-				return -1;
-		
-		return 0;
+		return checkStopCondition(oldC,newC);
 	}
 	
+	private int checkStopCondition(List<PointWritable> oldC, List<PointWritable> newC) {
+		for(int i=0; i<oldC.size(); i++)
+			if(oldC.get(i).distanceTo(newC.get(i)).doubleValue() > EBSELON)
+				return -1;
+		return 0;
+	}
 	
 }
