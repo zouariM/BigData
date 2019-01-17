@@ -41,7 +41,6 @@ public class SetInitCentroidsJob extends Configured implements Tool{
 		
 		while(reader.next(v) && vectors.size()<k) {
 			v.setK(vectors.size());
-			System.out.println(v);
 			vectors.add(v);	
 			v = new PointWritable();
 		}

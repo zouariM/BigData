@@ -13,6 +13,7 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.hadoop.util.Tool;
 
+import input.PointInputFormat;
 import writable.PointWritable;
 
 public class PointsParserJob extends Configured implements Tool{
@@ -42,6 +43,7 @@ public class PointsParserJob extends Configured implements Tool{
 		conf.set(COLUMNS_ARG_KEY, args[2]);
 		
 		FileInputFormat.addInputPath(job, pathIn);
+		job.setInputFormatClass(PointInputFormat.class);
 		FileOutputFormat.setOutputPath(job, pathOut);
 		
 		job.setMapperClass(PointsParserMapper.class);

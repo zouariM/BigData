@@ -1,10 +1,9 @@
 package input;
 
 import java.io.IOException;
-import java.util.HashSet;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.io.NullWritable;
+import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
@@ -12,11 +11,11 @@ import org.apache.hadoop.mapreduce.lib.input.LineRecordReader;
 
 import writable.PointWritable;
 
-public class ClusteringRecordReader extends RecordReader<PointWritable, NullWritable>{
+public class PointRecordReader extends RecordReader<LongWritable, PointWritable>{
 	
-	private LineRecordReader lineRecordReader;	
-	private PointWritable key;
-	private HashSet<PointWritable> keys;
+	private LineRecordReader lineRecordReader;
+	private LongWritable key;
+	private PointWritable value;
 	
 	private Configuration conf;
 	private int[] columns;
@@ -28,7 +27,6 @@ public class ClusteringRecordReader extends RecordReader<PointWritable, NullWrit
 		
 		conf = context.getConfiguration();
 		columns = conf.getInts("columns");	
-		keys = new HashSet<>();
 	}
 
 	@Override
@@ -36,17 +34,14 @@ public class ClusteringRecordReader extends RecordReader<PointWritable, NullWrit
 		if(!lineRecordReader.nextKeyValue()) {
 			return false;
 		}
-			
+		
+		key = lineRecordReader.getCurrentKey();
 		String currentLine = lineRecordReader.getCurrentValue().toString();
 
 		try {
 			PointWritable vector = new PointWritable(currentLine, columns);
-			if(keys.add(vector)) {
-				key = vector;
-				return true;
-			}
-			else
-				return nextKeyValue();
+			value = vector;
+			return true;
 		}
 		catch(IllegalArgumentException ex) {
 			return nextKeyValue();
@@ -54,13 +49,13 @@ public class ClusteringRecordReader extends RecordReader<PointWritable, NullWrit
 	}
 
 	@Override
-	public PointWritable getCurrentKey() throws IOException, InterruptedException {
+	public LongWritable getCurrentKey() throws IOException, InterruptedException {
 		return key;
 	}
 
 	@Override
-	public NullWritable getCurrentValue() throws IOException, InterruptedException {
-		return NullWritable.get();
+	public PointWritable getCurrentValue() throws IOException, InterruptedException {
+		return value;
 	}
 
 	@Override
@@ -72,6 +67,5 @@ public class ClusteringRecordReader extends RecordReader<PointWritable, NullWrit
 	public void close() throws IOException {
 		lineRecordReader.close();
 	}
-	
 
 }

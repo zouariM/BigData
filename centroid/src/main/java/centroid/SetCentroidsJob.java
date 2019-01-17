@@ -22,7 +22,7 @@ public class SetCentroidsJob extends Configured implements Tool{
 	@Override
 	public int run(String[] args) throws Exception {
 		if(args.length != 5) {
-			System.err.println("Invalid arguments: <inputPath> <outputPaht> <oldCentroidsPath> <newCentroidsPath> <clusterNumber>");
+			System.err.println("Invalid arguments: <inputPath> <outputPath> <oldCentroidsPath> <newCentroidsPath> <clusterNumber>");
 			return -1;
 		}
 		
