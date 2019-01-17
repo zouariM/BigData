@@ -11,13 +11,41 @@ import java.util.List;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
+import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.PathFilter;
 import org.apache.hadoop.util.Tool;
 
 import writable.PointWritable;
 
 public class StateJob extends Configured implements Tool{
+	
+	
+	/**
+	 * This should work as a replacement for the old getCentroids, it can work on bowth 
+	 * a single centroid file, or a directory containing job output files 
+	 * juste 3malt il fonction, ma sta3malthach w ma tastithach 
+	 */
+	private List<PointWritable> getCentroids(Path path, Comparator<PointWritable> comparator) throws IOException{
+		List<PointWritable > centroids = new ArrayList<>();
+		FileSystem fs = FileSystem.get(getConf());
+		
+		if(fs.isDirectory(path)) {
+			for(FileStatus s : fs.listStatus(path,(p) -> p.getName().startsWith("part")))  
+					centroids.addAll(getCentroids(s.getPath(),comparator));
+		}else {
+			DataInputStream reader = new DataInputStream(fs.open(path));
+			while(reader.available() > 0) {
+				PointWritable c = new PointWritable();
+				c.readFields(reader);
+				centroids.add(c);
+			}
+			reader.close();
+		}
+		Collections.sort(centroids, comparator);
+		return centroids;
+	}
 	
 	private List<PointWritable> getCentroids(InputStream in, Comparator<PointWritable> comparator) throws IOException
 	{
