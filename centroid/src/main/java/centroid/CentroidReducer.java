@@ -5,11 +5,11 @@ import java.io.IOException;
 
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.Text;
 
 import writable.AvgWritable;
+import writable.PointWritable;
 
-public class CentroidReducer extends CentroidReducerTask<Text>
+public class CentroidReducer extends CentroidReducerTask<PointWritable>
 {
 	private AvgWritable centroid;
 	
@@ -18,6 +18,7 @@ public class CentroidReducer extends CentroidReducerTask<Text>
 	{
 		centroid.setMoy();
 		this.centroid = centroid;
+		context.write(NULL_KEY, centroid.getSum());
 	}	
 	
 	@Override
@@ -28,5 +29,7 @@ public class CentroidReducer extends CentroidReducerTask<Text>
 		centroid.getSum().write(out);	
 		out.flush();
 		out.close();
+		
+		fs.close();
 	}
 }

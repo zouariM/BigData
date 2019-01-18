@@ -61,7 +61,6 @@ public class StateJob extends Configured implements Tool{
 		
 		fs.delete(old, false);
 		fs.rename(newP, old);
-		fs.close();
 		
 		oldC.forEach(System.out::println);
 		newC.forEach(System.out::println);

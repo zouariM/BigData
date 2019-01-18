@@ -1,6 +1,5 @@
 import java.util.StringJoiner;
 
-import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.util.ToolRunner;
 
 import centroid.SetCentroidsJob;
@@ -11,6 +10,13 @@ import result.ResultJob;
 
 public class Main {
 	
+	private static final String JOB_DIR = "/users/tests/";
+	private static final String SEQ_FILE_PATH = JOB_DIR + "seqfile";
+	private static final String OLD_CENTROIDS_PATH = JOB_DIR + "centroids_old.ser";
+	private static final String NEW_CENTROIDS_PATH = JOB_DIR + "centroids_new.ser";
+	private static final String JOB_RESULT_PATH = JOB_DIR + "result";
+	private static final String JOB_SET_CENTROIDS_PATH = JOB_DIR + "setcentroids";
+	
 	public static void main(String[] args) throws Exception {
 		// Sequence file of points
 		StringJoiner str = new StringJoiner(",");
@@ -18,16 +24,16 @@ public class Main {
 			str.add(args[i]);
 		String args1[] = {
 				args[0],
-				"/users/tests/seqfile",
+				SEQ_FILE_PATH,
 				str.toString()
 		};
 		ToolRunner.run(new PointsParserJob(), args1);
 		
 		// Initialisation of centroids
-		String seqFile = args1[1] + "/part-r-00000";
+		String seqFile = SEQ_FILE_PATH + "/part-r-00000";
 		String args2[] = {
 				seqFile,
-				"/users/tests/centroids_old.ser",
+				OLD_CENTROIDS_PATH,
 				args[2]
 		};
 		ToolRunner.run(new SetInitCentroidsJob(), args2);
@@ -35,9 +41,9 @@ public class Main {
 		// Set centroids loop
 		String args3[] = {
 			seqFile,
-			"/users/tests/res",
-			args2[1],
-			"/users/tests/centroids_new.ser",
+			JOB_SET_CENTROIDS_PATH,
+			OLD_CENTROIDS_PATH,
+			NEW_CENTROIDS_PATH,
 			args[2]
 		};
 		String args4[] = {
@@ -58,9 +64,9 @@ public class Main {
 		String args5[] = {
 				args[0],
 				args[1],
-				"/users/tests/res2",
+				JOB_RESULT_PATH,
 				str.toString(),
-				"/users/tests/centroids_old.ser",
+				OLD_CENTROIDS_PATH,
 		};
 		ToolRunner.run(new ResultJob(), args5);
 	}

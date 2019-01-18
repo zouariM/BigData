@@ -36,7 +36,8 @@ public class CentroidMapper extends Mapper<PointWritable, NullWritable, NullWrit
 		
 		int k = conf.getInt(SetCentroidsJob.CLUSTER_NBR_KEY, 0);
 		if(centroids.size() != k)
-			throw new IllegalStateException(String.format("clusterNb %s < centroids %s", k, centroids.size()));
+			throw new IllegalStateException(String.format("clusterNb %s < centroids %s file: %s", 
+					k, centroids.size(), centroidPath));
 	}
 	
 	@Override

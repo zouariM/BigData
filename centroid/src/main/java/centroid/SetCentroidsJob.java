@@ -11,6 +11,7 @@ import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
 
+import output.PointOutputFormat;
 import writable.AvgWritable;
 
 public class SetCentroidsJob extends Configured implements Tool{
@@ -43,9 +44,8 @@ public class SetCentroidsJob extends Configured implements Tool{
 		if(fs.exists(newCentroidsPath))
 			fs.delete(newCentroidsPath, false);
 		fs.create(newCentroidsPath);
-		
 		fs.close();
-		
+				
 		Job job = Job.getInstance();
 		job.setJarByClass(getClass());
 		Configuration conf = job.getConfiguration();
@@ -57,6 +57,7 @@ public class SetCentroidsJob extends Configured implements Tool{
 		FileInputFormat.addInputPath(job, pathIn);
 		FileOutputFormat.setOutputPath(job, pathOut);
 		job.setInputFormatClass(SequenceFileInputFormat.class);
+		job.setOutputFormatClass(PointOutputFormat.class);
 		
 		job.setMapperClass(CentroidMapper.class);
 		job.setCombinerClass(CentroidCombiner.class);

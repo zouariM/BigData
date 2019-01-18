@@ -28,7 +28,6 @@ public class SetInitCentroidsJob extends Configured implements Tool{
 		
 		if(!fs.exists(inputPath)) {
 			System.err.println(String.format("%s does not exist", inputPath));
-			fs.close();
 			return -1;
 		}
 		
@@ -48,18 +47,16 @@ public class SetInitCentroidsJob extends Configured implements Tool{
 		
 		if(vectors.size() < k) {
 			System.err.println(String.format("Valid lines %s less then cluster number %s", vectors.size(), k));
-			fs.close();
 			return -1;
 		}
-	
 		vectors.forEach(System.out::println);
+		
 		DataOutputStream out = new DataOutputStream(fs.create(centroidPath));
 		for(PointWritable vw:vectors)
 			vw.write(out);
 		out.flush();
 		
 		out.close();
-		fs.close();
 		return 0;
 	}
 
