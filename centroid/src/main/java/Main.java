@@ -10,12 +10,11 @@ import result.ResultJob;
 
 public class Main {
 	
-	private static final String JOB_DIR = "/users/tests/";
+	private static final String JOB_DIR = "/users/mustapha/tests/";
 	private static final String SEQ_FILE_PATH = JOB_DIR + "seqfile";
-	private static final String OLD_CENTROIDS_PATH = JOB_DIR + "centroids_old.ser";
-	private static final String NEW_CENTROIDS_PATH = JOB_DIR + "centroids_new.ser";
+	private static final String OLD_CENTROIDS_PATH = JOB_DIR + "old_centroids";
+	private static final String NEW_CENTROIDS_PATH = JOB_DIR + "new_centroids";
 	private static final String JOB_RESULT_PATH = JOB_DIR + "result";
-	private static final String JOB_SET_CENTROIDS_PATH = JOB_DIR + "setcentroids";
 	
 	public static void main(String[] args) throws Exception {
 		// Sequence file of points
@@ -36,26 +35,29 @@ public class Main {
 				OLD_CENTROIDS_PATH,
 				args[2]
 		};
+	
 		ToolRunner.run(new SetInitCentroidsJob(), args2);
 		
 		// Set centroids loop
 		String args3[] = {
 			seqFile,
-			JOB_SET_CENTROIDS_PATH,
-			OLD_CENTROIDS_PATH,
 			NEW_CENTROIDS_PATH,
+			OLD_CENTROIDS_PATH,
 			args[2]
 		};
 		String args4[] = {
-				args2[1],
-				args3[3]
+				OLD_CENTROIDS_PATH,
+				NEW_CENTROIDS_PATH
 		};
 		boolean cond;
 		
 		do {
 			// Set centroids iteration
+			System.out.println("before entering");
 			ToolRunner.run(new SetCentroidsJob(), args3);
+			System.out.println("done from set centroids");
 			// Stop condition
+			
 			cond = (ToolRunner.run(new StateJob(), args4) == 0) ? true:false;
 			System.out.println(cond);
 		}while(!cond);
@@ -63,8 +65,8 @@ public class Main {
 		// Put cluster number for each line
 		String args5[] = {
 				args[0],
-				args[1],
 				JOB_RESULT_PATH,
+				args[1],
 				str.toString(),
 				OLD_CENTROIDS_PATH,
 		};

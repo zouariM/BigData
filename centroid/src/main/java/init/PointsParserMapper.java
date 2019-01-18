@@ -13,8 +13,10 @@ public class PointsParserMapper extends Mapper<LongWritable, PointWritable, Poin
 	private static final NullWritable outValue = NullWritable.get();
 	
 	@Override
-	public void map(LongWritable key, PointWritable value, Context context) throws IOException, InterruptedException {
-		context.write(value, outValue);
+	public void map(LongWritable key, PointWritable value, Context context) throws IOException, InterruptedException 
+	{
+		if(value != null)
+			context.write(value, outValue);
 	}
 
 }

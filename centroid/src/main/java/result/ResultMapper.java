@@ -1,14 +1,12 @@
 package result;
 
-import java.io.DataInputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
+
+import manager.StateJob;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.NullWritable;
@@ -17,35 +15,24 @@ import org.apache.hadoop.mapreduce.Mapper;
 
 import writable.PointWritable;
 
-public class ResultMapper extends Mapper<LongWritable, Text, NullWritable, NullWritable>{
+public class ResultMapper extends Mapper<LongWritable, Text, NullWritable, Text>{
 	
-	private final Set<PointWritable> centroids = new HashSet<>();
+	private List<PointWritable> centroids;
 	private int columns[];
-	private PrintWriter print;
+	private static final NullWritable nullKey = NullWritable.get();
 	
 	@Override
 	protected void setup(Context context) throws IOException {
-		Configuration conf = context.getConfiguration();
-		FileSystem fs = FileSystem.get(conf);
-		
+		Configuration conf = context.getConfiguration();		
 		columns = conf.getInts(ResultJob.COLUMNS_KEY);
-		Path path = new Path(conf.get(ResultJob.RESULT_PATH_KEY));
-		print = new PrintWriter(fs.append(path));
+		Path path = new Path(conf.get(ResultJob.OUTPUT_PATH));
 		
-		Path centroidPath = new Path(conf.get(ResultJob.CENTROIDS_PATH)); 
-		DataInputStream in = new DataInputStream(fs.open(centroidPath)); 
-
-		while(in.available() > 0) {
-			PointWritable c = new PointWritable();
-			c.readFields(in);
-			centroids.add(c);
-		}
-		in.close();
+		centroids = StateJob.getCentroids(path, null);
 	}
 
 	
 	@Override
-	public void map(LongWritable key, Text value, Context context) {
+	public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
 		String result = "";
 		try {
 			PointWritable point = new PointWritable(value.toString(), columns);
@@ -63,12 +50,7 @@ public class ResultMapper extends Mapper<LongWritable, Text, NullWritable, NullW
 			result = String.format("%s,%s", value.toString(), "?");
 		}
 		
-		print.println(result);
+		context.write(nullKey, new Text(result));
 	}
 	
-	@Override
-	protected void cleanup(Context context) {
-		print.flush();
-		print.close();
-	}
 }

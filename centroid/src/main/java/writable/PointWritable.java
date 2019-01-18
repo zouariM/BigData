@@ -32,7 +32,7 @@ public class PointWritable implements WritableComparable<PointWritable>, Cloneab
 				coordinates[i] = Double.parseDouble(data[index]);				
 				}
 			catch(NumberFormatException | ArrayIndexOutOfBoundsException ex) {
-					throw new IllegalArgumentException();
+					throw new IllegalArgumentException(str);
 				}
 		
 		this.coordinates = new DoubleArrayWritable(coordinates);
@@ -103,9 +103,12 @@ public class PointWritable implements WritableComparable<PointWritable>, Cloneab
 		this.clusterId = k;
 	}
 	
-	public void devide(int n) {
-		for(DoubleWritable d:coordinates)
+	public PointWritable devide(int n) {
+		PointWritable moy = this.clone();
+		for(DoubleWritable d:moy.coordinates)
 			d.set(d.get()/n);
+		
+		return moy;
 	}
 	
 	@Override

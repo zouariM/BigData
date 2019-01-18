@@ -32,7 +32,7 @@ public class SetInitCentroidsJob extends Configured implements Tool{
 		}
 		
 		if(fs.exists(centroidPath))
-			fs.delete(centroidPath, false);
+			fs.delete(centroidPath, true);
 		
 		SequenceFile.Reader reader = new SequenceFile.Reader(getConf(), SequenceFile.Reader.file(inputPath));
 		PointWritable v = new PointWritable();

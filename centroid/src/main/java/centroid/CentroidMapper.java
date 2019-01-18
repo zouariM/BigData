@@ -1,13 +1,12 @@
 package centroid;
 
-import java.io.DataInputStream;
 import java.io.IOException;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
+
+import manager.StateJob;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapreduce.Mapper;
@@ -17,23 +16,15 @@ import writable.PointWritable;
 
 public class CentroidMapper extends Mapper<PointWritable, NullWritable, NullWritable, AvgWritable>{
 	
-	private final Set<PointWritable> centroids = new HashSet<>();
+	private List<PointWritable> centroids;
 	private static final NullWritable nullKey = NullWritable.get();
 	
 	@Override
 	protected void setup(Context context) throws IOException {
 		Configuration conf = context.getConfiguration();
-		FileSystem fs = FileSystem.get(conf);
-		Path centroidPath = new Path(context.getConfiguration().get(SetCentroidsJob.OLD_CENTROIDS_PATH_KEY)); 
-		DataInputStream in = new DataInputStream(fs.open(centroidPath)); 
+		Path centroidPath = new Path(context.getConfiguration().get(SetCentroidsJob.OLD_CENTROIDS_PATH_KEY));
+		centroids = StateJob.getCentroids(centroidPath, null);
 
-		while(in.available() > 0) {
-			PointWritable c = new PointWritable();
-			c.readFields(in);
-			centroids.add(c);
-		}
-		in.close();
-		
 		int k = conf.getInt(SetCentroidsJob.CLUSTER_NBR_KEY, 0);
 		if(centroids.size() != k)
 			throw new IllegalStateException(String.format("clusterNb %s < centroids %s file: %s", 

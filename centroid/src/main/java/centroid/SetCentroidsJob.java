@@ -13,24 +13,23 @@ import org.apache.hadoop.util.Tool;
 
 import output.PointOutputFormat;
 import writable.AvgWritable;
+import writable.PointWritable;
 
 public class SetCentroidsJob extends Configured implements Tool{
 	
 	public static final String CLUSTER_NBR_KEY = "clusterNbr";
 	public static final String OLD_CENTROIDS_PATH_KEY = "oldCentroidsPath";
-	public static final String NEW_CENTROIDS_PATH_KEY = "newCentroidsPath";
 	
 	@Override
 	public int run(String[] args) throws Exception {
-		if(args.length != 5) {
-			System.err.println("Invalid arguments: <inputPath> <outputPath> <oldCentroidsPath> <newCentroidsPath> <clusterNumber>");
+		if(args.length != 4) {
+			System.err.println("Invalid arguments: <inputPath> <outputPath> <oldCentroidsPath> <clusterNumber>");
 			return -1;
 		}
 		
 		Path pathIn = new Path(args[0]);
 		Path pathOut = new Path(args[1]);
-		Path newCentroidsPath = new Path(args[3]);
-		int clusterNb = Integer.parseInt(args[4]);
+		int clusterNb = Integer.parseInt(args[3]);
 		
 		FileSystem fs = FileSystem.get(getConf());
 		if(!fs.exists(pathIn)) {
@@ -41,18 +40,12 @@ public class SetCentroidsJob extends Configured implements Tool{
 		if(fs.exists(pathOut))
 			fs.delete(pathOut, true);
 		
-		if(fs.exists(newCentroidsPath))
-			fs.delete(newCentroidsPath, false);
-		fs.create(newCentroidsPath);
-		fs.close();
-				
 		Job job = Job.getInstance();
 		job.setJarByClass(getClass());
 		Configuration conf = job.getConfiguration();
 		
 		conf.setInt(CLUSTER_NBR_KEY, clusterNb);
 		conf.set(OLD_CENTROIDS_PATH_KEY, args[2]);
-		conf.set(NEW_CENTROIDS_PATH_KEY, args[3]);
 		
 		FileInputFormat.addInputPath(job, pathIn);
 		FileOutputFormat.setOutputPath(job, pathOut);
@@ -68,7 +61,7 @@ public class SetCentroidsJob extends Configured implements Tool{
 		
 		job.setMapOutputKeyClass(NullWritable.class);
 		job.setMapOutputValueClass(AvgWritable.class);
-		job.setOutputValueClass(NullWritable.class);
+		job.setOutputValueClass(PointWritable.class);
 				
 		return job.waitForCompletion(true)? 0:1;
 	}

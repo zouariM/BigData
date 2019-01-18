@@ -41,11 +41,13 @@ public class PointRecordReader extends RecordReader<LongWritable, PointWritable>
 		try {
 			PointWritable vector = new PointWritable(currentLine, columns);
 			value = vector;
-			return true;
 		}
 		catch(IllegalArgumentException ex) {
-			return nextKeyValue();
+			System.err.println("message =" + ex.getMessage());
+			value = null;
 		}		
+		
+		return true;
 	}
 
 	@Override

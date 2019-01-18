@@ -49,17 +49,13 @@ public class AvgWritable implements WritableComparable<AvgWritable>, Cloneable{
 		nb.set(nb.get()+1);
 		sum.add(vector);
 	}
-	
-	public void setMoy() {
-		sum.devide(nb.get());
-	}
 		
 	public PointWritable getSum() {
 		return sum;
 	}
 
 	public PointWritable getMoy() {
-		return sum;
+		return sum.devide(nb.get());
 	}
 	
 	@Override
