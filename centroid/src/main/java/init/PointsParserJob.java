@@ -9,7 +9,6 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
-import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.hadoop.util.Tool;
 
@@ -26,6 +25,7 @@ public class PointsParserJob extends Configured implements Tool{
 	public int run(String[] args) throws Exception {
 		Job job = Job.getInstance();
 		job.setJarByClass(getClass());
+		job.setJobName(this.getClass().getSimpleName());
 		
 		if(args.length != 3)
 			throw new IllegalArgumentException("<inputPath> <outputPath> <columns>");
@@ -44,7 +44,7 @@ public class PointsParserJob extends Configured implements Tool{
 		
 		FileInputFormat.addInputPath(job, pathIn);
 		job.setInputFormatClass(PointInputFormat.class);
-		FileOutputFormat.setOutputPath(job, pathOut);
+		SequenceFileOutputFormat.setOutputPath(job, pathOut);
 		
 		job.setMapperClass(PointsParserMapper.class);
 		job.setCombinerClass(PointsParserReducer.class);

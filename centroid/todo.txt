@@ -1,0 +1,7 @@
+1-- Partager le fichier des centroids comme un distributed cache
+2-- Implémenter un cleanup pour supprimer les fichiers temporaires
+3-- Améliorer le parsing des arguments pour chaque job
+4-- Inverser l'ordre des lignes de fichier résultat (garder le sens original)
+5-- Fixer le bug: chosir les k premiers valides distincts points (reimplémenter compareTo PointWritable)
+6-- Ajouter des compteurs pour le débogage (nbr de lignes invalides, nombre de points par cluster, etc)
+

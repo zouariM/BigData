@@ -8,7 +8,10 @@ import manager.StateJob;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.MapWritable;
 import org.apache.hadoop.io.NullWritable;
+import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapreduce.Mapper;
 
 import writable.AvgWritable;
@@ -22,23 +25,36 @@ public class CentroidMapper extends Mapper<PointWritable, NullWritable, NullWrit
 	@Override
 	protected void setup(Context context) throws IOException {
 		Configuration conf = context.getConfiguration();
-		Path centroidPath = new Path(context.getConfiguration().get(SetCentroidsJob.OLD_CENTROIDS_PATH_KEY));
+		Path centroidPath = new Path(context.getConfiguration().get(CentroidsJob.OLD_CENTROIDS_PATH_KEY));
 		centroids = StateJob.getCentroids(centroidPath, null);
 
-		int k = conf.getInt(SetCentroidsJob.CLUSTER_NBR_KEY, 0);
-		if(centroids.size() != k)
-			throw new IllegalStateException(String.format("clusterNb %s < centroids %s file: %s", 
-					k, centroids.size(), centroidPath));
+		int nb = conf.getInt(CentroidsJob.CENTROIDS_NB_KEY, 0);
+		
+		if(centroids.size() != nb)
+			throw new IllegalStateException(String.format("clusterNb %s != centroids %s file: %s", 
+					nb, centroids.size(), centroidPath));
 	}
 	
 	@Override
-	public void map(PointWritable key, NullWritable value, Context context) throws IOException, InterruptedException {		
-		Optional<PointWritable> op = centroids.stream().min((v1,v2)->v1.distanceTo(key).compareTo(v2.distanceTo(key)));
+	public void map(PointWritable key, NullWritable value, Context context) throws IOException, InterruptedException {	
+		final MapWritable clusters = key.getClusters();
+		Optional<PointWritable> op = centroids.stream()
+				.filter(v->{
+					MapWritable map = v.getClusters();
+					for(Writable k:clusters.keySet()) {
+						IntWritable x = (IntWritable)clusters.get(k);
+						IntWritable y = (IntWritable)map.get(k);
+						if(!x.equals(y))
+							return false;
+					}
+							
+					return true;
+				})
+				.min((v1,v2)->v1.distanceTo(key).compareTo(v2.distanceTo(key)));
 		
 		if(op.isPresent()) {
 			PointWritable centroid = op.get();
-			int k = centroid.getClusterId();			
-			key.setK(k);
+			key.setClusters(centroid.getClusters());
 			AvgWritable avg = new AvgWritable(key);;
 			
 			context.write(nullKey, avg);

@@ -12,16 +12,17 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
 import writable.PointWritable;
 
-public class PointOutputFormat extends FileOutputFormat<NullWritable, PointWritable>{
-
+public class PointOutputFormat extends FileOutputFormat<PointWritable, NullWritable>{
+	
 	@Override
-	public RecordWriter<NullWritable, PointWritable> getRecordWriter(TaskAttemptContext job)
+	public RecordWriter<PointWritable, NullWritable> getRecordWriter(TaskAttemptContext job)
 			throws IOException, InterruptedException {
 		FileSystem fs = FileSystem.get(job.getConfiguration());
 		Path path = getDefaultWorkFile(job, ".ser");
 		DataOutputStream out = new DataOutputStream(fs.create(path));
 		
-		return new PointRecordWriter(out);
+		return new DataRecordWriter<PointWritable, NullWritable>(out);
 	}
+
 
 }

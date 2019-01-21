@@ -17,7 +17,7 @@ public class DoubleArrayWritable extends ArrayWritable implements Iterable<Doubl
 	}
 	
 	public DoubleArrayWritable(double[] values) {
-		super(DoubleArrayWritable.class);
+		super(DoubleWritable.class);
 		set(values);
 	}
 	

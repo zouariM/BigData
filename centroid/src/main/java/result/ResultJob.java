@@ -32,12 +32,14 @@ public class ResultJob extends Configured implements Tool{
 			throw new IllegalArgumentException(String.format("%s not found", input));
 		
 		if(fs.exists(outputPath))
-			fs.delete(outputPath, false);
+			fs.delete(outputPath, true);
 		
 		Job job = Job.getInstance();
 		job.setJarByClass(getClass());
-		
+		job.setJobName(this.getClass().getSimpleName());
+
 		Configuration conf = job.getConfiguration();
+		conf.set(OUTPUT_PATH, args[1]);
 		conf.set(COLUMNS_KEY, args[2]);
 		conf.set(CENTROIDS_PATH, args[3]);
 		

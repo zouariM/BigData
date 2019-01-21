@@ -3,25 +3,26 @@ package writable;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.StringJoiner;
 
 import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.MapWritable;
+import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.io.WritableComparable;
 
 public class PointWritable implements WritableComparable<PointWritable>, Cloneable{
 
-	private DoubleArrayWritable coordinates;	
-	private IntWritable clusterId;
+	private DoubleArrayWritable coordinates;
+	private MapWritable clusters;
 	
 	public PointWritable() {
 		super();
 		coordinates = new DoubleArrayWritable();
-		clusterId = new IntWritable();
+		clusters = new MapWritable();
 	}
 	
 	public PointWritable(String str, int columns[]){
-		clusterId = new IntWritable();
-		
 		String data[] = str.split(",");
 		int dimension = columns.length;
 		double coordinates[] = new double[dimension];
@@ -36,22 +37,27 @@ public class PointWritable implements WritableComparable<PointWritable>, Cloneab
 				}
 		
 		this.coordinates = new DoubleArrayWritable(coordinates);
+		this.clusters = new MapWritable();
 	}
 	
 	@Override
 	public void write(DataOutput out) throws IOException {
 		coordinates.write(out);
-		clusterId.write(out);
+		clusters.write(out);
 	}
 
 	@Override
 	public void readFields(DataInput in) throws IOException {
 		coordinates.readFields(in);
-		clusterId.readFields(in);
+		clusters.readFields(in);
 	}
 
 	public int getDimension() {
 		return coordinates.length();
+	}
+	
+	public int getLevels() {
+		return clusters.size();
 	}
 	
 	@Override
@@ -91,16 +97,29 @@ public class PointWritable implements WritableComparable<PointWritable>, Cloneab
 		return new Double(Math.sqrt(distance));
 	}
 
-	public Integer getClusterId() {
-		return clusterId.get();
+	public IntWritable getCluster(IntWritable level) {
+		return (IntWritable)clusters.get(level);
 	}
 	
-	public void setK(int k) {
-		this.clusterId.set(k);
+	public IntWritable getBelowest() {
+		int l = getLevels();
+		return getCluster(new IntWritable(l-1));
 	}
 	
-	public void setK(IntWritable k) {
-		this.clusterId = k;
+	public MapWritable getClusters() {
+		return new MapWritable(clusters);
+	}
+	
+	public void setCluster(IntWritable level, IntWritable id) {
+		clusters.put(level, id);
+	}
+	
+	public void setClusters(MapWritable clusters) {
+		this.clusters = new MapWritable(clusters);
+	}
+	
+	public void copyClusters(PointWritable point) {
+		this.clusters = new MapWritable(point.clusters);
 	}
 	
 	public PointWritable devide(int n) {
@@ -134,9 +153,13 @@ public class PointWritable implements WritableComparable<PointWritable>, Cloneab
 	
 	@Override
 	public String toString() {
+		StringJoiner str = new StringJoiner(",");
+		for(Writable level:clusters.keySet())
+			str.add(String.format("%s:%s", (IntWritable)level, (IntWritable)clusters.get(level)));
+		
 		return "Point [dimension=" + coordinates.length() 
 				+ ", coordinates=" + coordinates 
-				+ ", cluster= "+clusterId+"]";
+				+ ", clusters= "+str.toString()+"]";
 	}
 	
 	public PointWritable clone() {
@@ -144,7 +167,9 @@ public class PointWritable implements WritableComparable<PointWritable>, Cloneab
 		
 		try {
 			point = (PointWritable) super.clone();
-			point.coordinates = coordinates.clone(); 
+			point.coordinates = coordinates.clone();
+			point.clusters = new MapWritable(clusters);
+			
 		} catch (CloneNotSupportedException e) {
 			// Impossible
 			e.printStackTrace();

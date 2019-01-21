@@ -1,4 +1,4 @@
-package centroid;
+package hierarchical;
 
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.MapWritable;
@@ -6,13 +6,13 @@ import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapreduce.Partitioner;
 
-import writable.AvgWritable;
+import writable.PointWritable;
 
-public class CentroidPartionner extends Partitioner<NullWritable, AvgWritable> {
-
+public class HierarchicalPartitionner extends Partitioner<PointWritable, NullWritable>{
+	
 	@Override
-	public int getPartition(NullWritable key, AvgWritable value, int numPartitions) {
-		MapWritable levels = value.getSum().getClusters();
+	public int getPartition(PointWritable key, NullWritable value, int numPartitions) {
+		MapWritable levels = key.getClusters();
 		Integer reducerNum = 0;
 		int clusterNb = (int)Math.exp(Math.log(numPartitions)/levels.size());
 		
