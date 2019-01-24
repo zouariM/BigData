@@ -18,7 +18,7 @@ public class PointOutputFormat extends FileOutputFormat<PointWritable, NullWrita
 	public RecordWriter<PointWritable, NullWritable> getRecordWriter(TaskAttemptContext job)
 			throws IOException, InterruptedException {
 		FileSystem fs = FileSystem.get(job.getConfiguration());
-		Path path = getDefaultWorkFile(job, ".ser");
+		Path path = getDefaultWorkFile(job, "");
 		DataOutputStream out = new DataOutputStream(fs.create(path));
 		
 		return new DataRecordWriter<PointWritable, NullWritable>(out);

@@ -16,11 +16,13 @@ public class ResultJob extends Configured implements Tool{
 	public static final String COLUMNS_KEY = "columns";
 	public static final String OUTPUT_PATH = "outputPath";
 	public static final String CENTROIDS_PATH = "centroidsPath";
+	public static final String LEVELS_NB_KEY = "levelsNb";
 	
 	@Override
 	public int run(String[] args) throws Exception {
-		if(args.length != 4) {
-			System.err.println("Invalid arguments: try <inputPath> <outputPath> <columns> <centroidsPath>");
+		if(args.length != 5) {
+			System.err.println("Invalid arguments: try <inputPath> <outputPath> "
+								+ "<columns> <centroidsPath> <levelsNb>");
 			return -1;
 		}
 		
@@ -42,6 +44,7 @@ public class ResultJob extends Configured implements Tool{
 		conf.set(OUTPUT_PATH, args[1]);
 		conf.set(COLUMNS_KEY, args[2]);
 		conf.set(CENTROIDS_PATH, args[3]);
+		conf.setInt(LEVELS_NB_KEY, Integer.parseInt(args[4]));
 		
 		FileInputFormat.addInputPath(job, input);
 		FileOutputFormat.setOutputPath(job, outputPath);

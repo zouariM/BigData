@@ -90,7 +90,7 @@ public class StateJob extends Configured implements Tool{
 		newC.forEach(System.out::println);
 		
 		for(int i=0; i<oldC.size(); i++)
-			if(oldC.get(i).distanceTo(newC.get(i)) <= epsilon)
+			if(oldC.get(i).distanceTo(newC.get(i)) >= epsilon)
 				return -1;
 		
 		return 0;

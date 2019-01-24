@@ -50,7 +50,13 @@ public class Main {
 					OLD_CENTROIDS_PATH,
 					clusterNb.toString()
 			};	
-			ToolRunner.run(new SetInitCentroidsJob(), args2);
+			try{
+				ToolRunner.run(new SetInitCentroidsJob(), args2);
+			}
+			catch(IllegalStateException ex) {
+				ex.printStackTrace();
+				break;
+			}
 			
 			// Set centroids loop
 			CentroidsJob centroidsJob = new CentroidsJob();			
@@ -75,7 +81,6 @@ public class Main {
 						NEW_CENTROIDS_PATH
 				};
 				cond = (ToolRunner.run(stateJob, args4) == 0) ? true:false;
-				
 				System.out.println(cond);
 			}while(!cond);
 			
@@ -99,6 +104,7 @@ public class Main {
 				args[1],
 				str.toString(),
 				OLD_CENTROIDS_PATH,
+				levels.toString()
 		};
 		ToolRunner.run(new ResultJob(), args6);
 
