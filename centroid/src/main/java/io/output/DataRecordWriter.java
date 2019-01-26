@@ -1,4 +1,4 @@
-package output;
+package io.output;
 
 import java.io.DataOutputStream;
 import java.io.IOException;

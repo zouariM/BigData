@@ -1,4 +1,4 @@
-package centroid;
+package job.centroid;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -7,9 +7,9 @@ import java.util.List;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapreduce.Reducer;
 
-import writable.AvgWritable;
+import io.writable.AvgWritable;
 
-public abstract class CentroidReducerTask<VALUEOUT>extends Reducer<NullWritable, AvgWritable, NullWritable, VALUEOUT>
+public abstract class ClusterCentroidReducerTask<VALUEOUT>extends Reducer<NullWritable, AvgWritable, NullWritable, VALUEOUT>
 {	
 	protected static final NullWritable NULL_KEY = NullWritable.get();
 	

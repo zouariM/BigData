@@ -1,10 +1,8 @@
-package result;
+package job.result.hierarichical;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
-
-import manager.StateJob;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
@@ -14,7 +12,8 @@ import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
-import writable.PointWritable;
+import io.writable.impl.PointWritable;
+import job.centroid.StateJob;
 
 public class ResultMapper extends Mapper<LongWritable, Text, NullWritable, Text>{
 	
@@ -42,7 +41,8 @@ public class ResultMapper extends Mapper<LongWritable, Text, NullWritable, Text>
 		int levelsV = 0;
 		
 		try {
-			PointWritable point = new PointWritable(value.toString(), columns);
+			PointWritable point = new PointWritable();
+			point.parseLine(value.toString(), columns);
 			Optional<PointWritable> op = centroids.stream().min((v1,v2)->v1.distanceTo(point).compareTo(v2.distanceTo(point)));
 			
 			if(op.isPresent()) {

@@ -1,4 +1,4 @@
-package hierarchical;
+package job.hierarchical;
 
 import java.io.FileNotFoundException;
 
@@ -12,9 +12,7 @@ import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.hadoop.util.Tool;
 
-import writable.PointWritable;
-
-public class HierarchicalJob extends Configured implements Tool{
+public abstract class ClusterHierarchicalJob extends Configured implements Tool{
 
 	public static final String CENTROIDS_PATH = "centroidsPath";
 	
@@ -49,16 +47,25 @@ public class HierarchicalJob extends Configured implements Tool{
 		SequenceFileOutputFormat.setOutputPath(job, pathOut);
 		job.setOutputFormatClass(SequenceFileOutputFormat.class);
 
-		job.setMapperClass(HierarchicalMapper.class);
-		job.setPartitionerClass(HierarchicalPartitionner.class);
-		job.setReducerClass(HierarchicalReducer.class);
+		this.setJob(job);
+		job.setOutputValueClass(NullWritable.class);
+		
 		int numReducers = (int)Math.pow(clusterNb, levelsNb);
 		job.setNumReduceTasks(numReducers);
-		
-		job.setOutputKeyClass(PointWritable.class);
-		job.setOutputValueClass(NullWritable.class);
 		
 		return job.waitForCompletion(true) ? 0:1;
 	}
 
+	private void setJob(Job job) {
+		this.setMapperClass(job);
+		this.setPartitionnerClass(job);
+		this.setPartitionnerClass(job);
+		this.setReducerClass(job);
+		this.setOutputKeyClass(job);
+	}
+	
+	protected abstract void setMapperClass(Job job);
+	protected abstract void setPartitionnerClass(Job job);
+	protected abstract void setReducerClass(Job job);
+	protected abstract void setOutputKeyClass(Job job);
 }

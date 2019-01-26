@@ -1,4 +1,4 @@
-package manager;
+package job.centroid;
 
 import java.io.DataInputStream;
 import java.io.FileNotFoundException;
@@ -14,9 +14,10 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.util.Tool;
-import org.apache.hadoop.fs.FileStatus;
 
-import writable.PointWritable;
+import io.writable.impl.PointWritable;
+
+import org.apache.hadoop.fs.FileStatus;
 
 public class StateJob extends Configured implements Tool{
 	

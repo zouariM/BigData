@@ -1,4 +1,4 @@
-package centroid;
+package job.centroid;
 
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.MapWritable;
@@ -6,9 +6,9 @@ import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapreduce.Partitioner;
 
-import writable.AvgWritable;
+import io.writable.AvgWritable;
 
-public class CentroidPartionner extends Partitioner<NullWritable, AvgWritable> {
+public class ClusterCentroidPartionner extends Partitioner<NullWritable, AvgWritable> {
 
 	@Override
 	public int getPartition(NullWritable key, AvgWritable value, int numPartitions) {

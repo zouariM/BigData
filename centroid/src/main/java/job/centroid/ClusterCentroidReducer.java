@@ -1,11 +1,11 @@
-package centroid;
+package job.centroid;
 
 import java.io.IOException;
 
-import writable.AvgWritable;
-import writable.PointWritable;
+import io.writable.AvgWritable;
+import io.writable.impl.PointWritable;
 
-public class CentroidReducer extends CentroidReducerTask<PointWritable>
+public class ClusterCentroidReducer extends ClusterCentroidReducerTask<PointWritable>
 {	
 	@Override
 	protected void writeContext(Context context, AvgWritable centroid) throws IOException, InterruptedException 

@@ -1,4 +1,4 @@
-package writable;
+package io.writable.impl;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -9,9 +9,11 @@ import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.MapWritable;
 import org.apache.hadoop.io.Writable;
-import org.apache.hadoop.io.WritableComparable;
 
-public class PointWritable implements WritableComparable<PointWritable>, Cloneable{
+import io.writable.ClusterWritable;
+import io.writable.DoubleArrayWritable;
+
+public class PointWritable implements ClusterWritable<PointWritable>{
 
 	private DoubleArrayWritable coordinates;
 	private MapWritable clusters;
@@ -20,24 +22,6 @@ public class PointWritable implements WritableComparable<PointWritable>, Cloneab
 		super();
 		coordinates = new DoubleArrayWritable();
 		clusters = new MapWritable();
-	}
-	
-	public PointWritable(String str, int columns[]){
-		String data[] = str.split(",");
-		int dimension = columns.length;
-		double coordinates[] = new double[dimension];
-
-		for(int i=0; i<dimension; i++)
-			try {
-				int index = columns[i];
-				coordinates[i] = Double.parseDouble(data[index]);				
-				}
-			catch(NumberFormatException | ArrayIndexOutOfBoundsException ex) {
-					throw new IllegalArgumentException(str);
-				}
-		
-		this.coordinates = new DoubleArrayWritable(coordinates);
-		this.clusters = new MapWritable();
 	}
 	
 	@Override
@@ -85,12 +69,14 @@ public class PointWritable implements WritableComparable<PointWritable>, Cloneab
 		this.coordinates.set(tab);;
 	}
 	
-	public Double distanceTo(PointWritable v) {
+	@Override
+	public Double distanceTo(ClusterWritable<PointWritable> p) {
+		PointWritable point = p.getPoint();
 		double distance = 0d;
 		int l = coordinates.length();
 		
 		for(int i=0; i<l; i++) {
-			double diff = coordinates.get(i).get() - v.coordinates.get(i).get();
+			double diff = coordinates.get(i).get() - point.coordinates.get(i).get();
 			distance += Math.pow(diff, 2d);
 		}
 		
@@ -104,6 +90,16 @@ public class PointWritable implements WritableComparable<PointWritable>, Cloneab
 	public IntWritable getBelowest() {
 		int l = getLevels();
 		return getCluster(new IntWritable(l-1));
+	}
+	
+	public String getClusterId() {
+		StringJoiner str = new StringJoiner(",");
+		int levelsNb = getLevels();
+		
+		for(int i=0; i<levelsNb; i++)
+			str.add(clusters.get(new IntWritable(i)).toString());
+		
+		return str.toString();
 	}
 	
 	public MapWritable getClusters() {
@@ -162,6 +158,7 @@ public class PointWritable implements WritableComparable<PointWritable>, Cloneab
 				+ ", clusters= "+str.toString()+"]";
 	}
 	
+	@Override
 	public PointWritable clone() {
 		PointWritable point = null;
 		
@@ -176,5 +173,29 @@ public class PointWritable implements WritableComparable<PointWritable>, Cloneab
 		}
 		
 		return point;
+	}
+
+	@Override
+	public void parseLine(String line, int[] columns) {
+		String data[] = line.split(",");
+		int dimension = columns.length;
+		double coordinates[] = new double[dimension];
+
+		for(int i=0; i<dimension; i++)
+			try {
+				int index = columns[i];
+				coordinates[i] = Double.parseDouble(data[index]);				
+				}
+			catch(NumberFormatException | ArrayIndexOutOfBoundsException ex) {
+					throw new IllegalArgumentException(line);
+				}
+		
+		this.coordinates = new DoubleArrayWritable(coordinates);
+		this.clusters = new MapWritable();		
+	}
+
+	@Override
+	public PointWritable getPoint() {
+		return this;
 	}
 }

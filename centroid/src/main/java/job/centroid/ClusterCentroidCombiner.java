@@ -1,13 +1,13 @@
-package centroid;
+package job.centroid;
 
 import java.io.IOException;
 
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapreduce.Reducer;
 
-import writable.AvgWritable;
+import io.writable.AvgWritable;
 
-public class CentroidCombiner extends CentroidReducerTask<AvgWritable>{
+public class ClusterCentroidCombiner extends ClusterCentroidReducerTask<AvgWritable>{
 
 	@Override
 	protected void writeContext(Reducer<NullWritable, AvgWritable, NullWritable, AvgWritable>.Context context,

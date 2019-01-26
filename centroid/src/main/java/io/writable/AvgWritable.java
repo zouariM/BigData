@@ -1,4 +1,4 @@
-package writable;
+package io.writable;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -6,6 +6,8 @@ import java.io.IOException;
 
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Writable;
+
+import io.writable.impl.PointWritable;
 
 public class AvgWritable implements Writable, Cloneable{
 	
@@ -19,7 +21,7 @@ public class AvgWritable implements Writable, Cloneable{
 
 	public AvgWritable(PointWritable vector) {
 		this.nb = new IntWritable(1);
-		this.sum = vector;
+		this.sum = vector.clone();
 	}
 	
 	public void add(AvgWritable avg) {

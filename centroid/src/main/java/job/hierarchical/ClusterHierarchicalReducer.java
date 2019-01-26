@@ -1,4 +1,4 @@
-package hierarchical;
+package job.hierarchical;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -6,12 +6,12 @@ import java.util.Iterator;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapreduce.Reducer;
 
-import writable.PointWritable;
+import io.writable.ClusterWritable;
 
-public class HierarchicalReducer extends Reducer<PointWritable, NullWritable, PointWritable, NullWritable>{
+public class ClusterHierarchicalReducer<T extends ClusterWritable<T>> extends Reducer<T, NullWritable, T, NullWritable>{
 	
 	@Override
-	public void reduce(PointWritable key, Iterable<NullWritable> values, Context context) 
+	public void reduce(T key, Iterable<NullWritable> values, Context context) 
 			throws IOException, InterruptedException 
 	{
 		Iterator<NullWritable> it = values.iterator();

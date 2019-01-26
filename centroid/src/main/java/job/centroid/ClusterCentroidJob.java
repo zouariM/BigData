@@ -1,4 +1,4 @@
-package centroid;
+package job.centroid;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
@@ -11,12 +11,12 @@ import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
 
-import output.PointOutputFormat;
-import writable.AvgWritable;
-import writable.PointWritable;
+import io.output.PointOutputFormat;
+import io.writable.AvgWritable;
+import io.writable.impl.PointWritable;
 
 
-public class CentroidsJob extends Configured implements Tool{
+public abstract class ClusterCentroidJob extends Configured implements Tool{
 	
 	public static final String CENTROIDS_NB_KEY = "centroidsNb";
 	public static final String OLD_CENTROIDS_PATH_KEY = "oldCentroidsPath";
@@ -57,11 +57,11 @@ public class CentroidsJob extends Configured implements Tool{
 		FileOutputFormat.setOutputPath(job, pathOut);
 		job.setOutputFormatClass(PointOutputFormat.class);
 
-		job.setMapperClass(CentroidMapper.class);
-		job.setCombinerClass(CentroidCombiner.class);
-		job.setPartitionerClass(CentroidPartionner.class);
+		job.setMapperClass(ClusterCentroidMapper.class);
+		job.setCombinerClass(ClusterCentroidCombiner.class);
+		job.setPartitionerClass(ClusterCentroidPartionner.class);
 		
-		job.setReducerClass(CentroidReducer.class);
+		job.setReducerClass(ClusterCentroidReducer.class);
 		job.setNumReduceTasks(numReducers);
 		
 		job.setMapOutputKeyClass(NullWritable.class);
@@ -71,4 +71,5 @@ public class CentroidsJob extends Configured implements Tool{
 		return job.waitForCompletion(true)? 0:1;
 	}
 
+	protected abstract void setMapperClass(Job job);
 }

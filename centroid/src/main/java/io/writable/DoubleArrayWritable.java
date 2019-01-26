@@ -1,4 +1,4 @@
-package writable;
+package io.writable;
 
 import java.util.ArrayList;
 import java.util.Arrays;

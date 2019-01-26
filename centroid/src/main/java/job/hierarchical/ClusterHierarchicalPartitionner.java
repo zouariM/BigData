@@ -1,4 +1,4 @@
-package hierarchical;
+package job.hierarchical;
 
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.MapWritable;
@@ -6,13 +6,13 @@ import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapreduce.Partitioner;
 
-import writable.PointWritable;
+import io.writable.ClusterWritable;
 
-public class HierarchicalPartitionner extends Partitioner<PointWritable, NullWritable>{
+public class ClusterHierarchicalPartitionner<T extends ClusterWritable<T>> extends Partitioner<T, NullWritable>{
 	
 	@Override
-	public int getPartition(PointWritable key, NullWritable value, int numPartitions) {
-		MapWritable levels = key.getClusters();
+	public int getPartition(T key, NullWritable value, int numPartitions) {
+		MapWritable levels = key.getPoint().getClusters();
 		Integer reducerNum = 0;
 		int clusterNb = (int)Math.exp(Math.log(numPartitions)/levels.size());
 		

@@ -1,4 +1,4 @@
-package output;
+package io.output;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -10,7 +10,7 @@ import org.apache.hadoop.mapreduce.RecordWriter;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
-import writable.PointWritable;
+import io.writable.impl.PointWritable;
 
 public class PointOutputFormat extends FileOutputFormat<PointWritable, NullWritable>{
 	
