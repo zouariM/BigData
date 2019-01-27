@@ -6,16 +6,12 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.util.ToolRunner;
 
 import io.writable.impl.LabelPointWritable;
-import io.writable.impl.PointWritable;
 import job.centroid.ClusterCentroidJob;
 import job.centroid.SetInitCentroidsJob;
 import job.centroid.StateJob;
 import job.centroid.impl.PointCentroidJob;
 import job.hierarchical.impl.LabelPointHierarchicalJob;
-import job.hierarchical.impl.PointHierarchicalJob;
 import job.parser.impl.LabelPointParserJob;
-import job.parser.impl.PointParserJob;
-import job.result.hierarichical.ResultJob;
 import job.result.label.LabelResultJob;
 
 public class Main {
@@ -44,6 +40,7 @@ public class Main {
 				SEQ_FOLDER_PATH,
 				str.toString()
 		};
+		//ToolRunner.run(new PointParserJob(), args1);
 		ToolRunner.run(new LabelPointParserJob(), args1);
 		
 		FileSystem fs = FileSystem.get(new Configuration());
@@ -58,6 +55,7 @@ public class Main {
 					clusterNb.toString()
 			};	
 			try{
+				//ToolRunner.run(new SetInitCentroidsJob<PointWritable>(PointWritable.class), args2);
 				ToolRunner.run(new SetInitCentroidsJob<LabelPointWritable>(LabelPointWritable.class), args2);
 			}
 			catch(IllegalStateException ex) {
@@ -98,6 +96,7 @@ public class Main {
 					clusterNb.toString(),
 					new Integer(i+1).toString()
 			};
+			//ToolRunner.run(new PointHierarchicalJob(), args5);
 			ToolRunner.run(new LabelPointHierarchicalJob(), args5);
 			
 			fs.delete(seq, true);
