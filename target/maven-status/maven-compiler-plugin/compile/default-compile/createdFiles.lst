@@ -1,0 +1,10 @@
+LabelingJob.class
+Main.class
+InitialisationJob.class
+data/LabelPoint.class
+HierarchicalClusteringJob.class
+data/Data.class
+data/AvgLabelPoint.class
+data/ClusterPoint.class
+ClusteringJob.class
+data/Point.class
